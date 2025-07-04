@@ -6,6 +6,11 @@ const { Server } = require('socket.io');
 const app = express();
 app.use(cors());
 
+// Optional: Health check route (avoids "Cannot GET /")
+app.get('/', (req, res) => {
+  res.send('✅ Socket.IO server is running');
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -14,34 +19,30 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('✅ User connected:', socket.id)
+  console.log('✅ User connected:', socket.id);
 
-  // Single, clean handler for incoming chat messages with timestamp
   socket.on('chat message', (msg) => {
     const messageWithTime = {
       ...msg,
       createdAt: new Date().toISOString(),
-    }
-    io.emit('chat message', messageWithTime)
-  })
+    };
+    io.emit('chat message', messageWithTime);
+  });
 
   socket.on('typing', ({ to, from, name }) => {
-    // Send typing event only to the intended recipient
     socket.to(to).emit('typing', { from, name });
   });
 
   socket.on('stopTyping', ({ to, from }) => {
-    // Send stopTyping event only to the intended recipient
     socket.to(to).emit('stopTyping', { from });
   });
 
   socket.on('disconnect', () => {
-    console.log('🛑 User disconnected:', socket.id)
-  })
-})
+    console.log('🛑 User disconnected:', socket.id);
+  });
+});
+
 const PORT = process.env.PORT || 4500;
 server.listen(PORT, () => {
   console.log(`✅ Socket.IO server running at http://localhost:${PORT}`);
 });
-
-
