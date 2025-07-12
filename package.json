@@ -4,8 +4,8 @@
   "description": "Simple chat server using Express and Socket.IO",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node socketServer.js",
+  "dev": "nodemon socketServer.js"
   },
   "author": "Your Name",
   "license": "ISC",
